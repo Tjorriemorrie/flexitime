@@ -1,0 +1,16 @@
+module: default
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: ssl
+  version: latest
+
+handlers:
+- url: /static
+  static_dir: src/static
+
+- url: /.*
+  script: src.app
+  login: optional
