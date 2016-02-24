@@ -1,9 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import createBrowserHistory from 'history/lib/createBrowserHistory'
-import {Router, Route, IndexRoute} from 'react-router';
-import App from './App.jsx';
-import Home from './Home.jsx';
+import { Router, Route, IndexRoute, browserHistory } from 'react-router';
+import App from './components/app.jsx';
+import Home from './home.jsx';
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import Reducers from './reducers.jsx';
+import thunkMiddleware from 'redux-thunk';
+import createLogger from 'redux-logger';
 
 
 let routes = (
@@ -14,8 +18,19 @@ let routes = (
     </Router>
 );
 
-let history = createBrowserHistory();
 
-const el = document.getElementById('app');
+const store = createStore(
+    Reducers,
+    applyMiddleware(
+        thunkMiddleware, // lets us dispatch() functions
+        createLogger() // neat middleware that logs actions
+    )
+);
 
-ReactDOM.render(<Router routes={routes} history={history}/>, el);
+
+ReactDOM.render(
+    <Provider store={store}>
+        <Router routes={routes} history={browserHistory}/>
+    </Provider>,
+    document.getElementById('app')
+);

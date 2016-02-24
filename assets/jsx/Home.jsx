@@ -1,20 +1,19 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
+import LocationsContainer from './controls/locationsContainer.jsx';
+import Viz from './Viz.jsx';
 
 
-export default class Home extends React.Component {
+const Home = () => (
+    <div className="main_page">
+        <LocationsContainer />
+        <Viz />
+    </div>
+);
 
-    render() {
-        console.info('[Home] render');
-        return <div className="main_page">
-            main page
+Home.propTypes = {
+  //onClick: PropTypes.func.isRequired,
+  //completed: PropTypes.bool.isRequired,
+  //text: PropTypes.string.isRequired
+};
 
-            <div className="controls">
-                <p>controls</p>
-            </div>
-            <div className="viz">
-                <p>viz</p>
-            </div>
-        </div>;
-    }
-
-}
+export default Home;

@@ -1,6 +1,23 @@
 @import 'base';
 
+.main_page, .app_page {
+  height: 100%;
+}
+
 .main_page {
   display: flex;
+  align-items: stretch;
 
+  & > div {
+    flex: 1 1 auto;
+    border: 1px solid gray;
+  }
+
+  .controls {
+    flex: 1 0 auto;
+  }
+
+  .viz {
+    flex: 3 1 auto;
+  }
 }
