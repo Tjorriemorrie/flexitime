@@ -1,18 +1,20 @@
 import { connect } from 'react-redux';
-import { changeAddress } from './actions.jsx';
-import Locations from './locations.jsx';
+import { changeAddress, fetchDirections } from '../actions/locations.jsx';
+import Locations from '../components/locations.jsx';
 
 const mapStateToProps = (state) => {
     return {
         home: state.locations.home,
-        work: state.locations.work
+        work: state.locations.work,
+        directions: state.directions
     }
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onChange: (text, place) => {
-            dispatch(changeAddress(text, place))
+        onChange: (places, place) => {
+            dispatch(changeAddress(places, place));
+            dispatch(fetchDirections());
         }
     }
 };

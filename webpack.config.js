@@ -22,7 +22,7 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /(node_modules|bower_components)/,
-                loaders: ['react-hot', 'babel?cacheDirectory,presets[]=react,presets[]=es2015']
+                loaders: ['react-hot', 'babel?cacheDirectory,presets[]=react,presets[]=es2015,presets[]=stage-0']
             },
             {
                 test: /\.less$/,

@@ -1,11 +1,12 @@
+import fetchSuggestions from '../actions/locations.jsx';
+
+
 const defaultLocations = {
     home: {
-        address: '',
-        suggestions: []
+        place: null,
     },
     work: {
-        address: '',
-        suggestions: []
+        place: null,
     }
 };
 
@@ -13,11 +14,14 @@ export const locations = (state = defaultLocations, action) => {
     switch (action.type) {
         default:
             return state;
+
         case 'CHANGE_ADDRESS':
+            let place = (action.places.length == 1 && action.places[0].geometry) ? action.places[0] : null;
             return Object.assign({}, state, {
-                [action.place]: Object.assign({}, state[action.place], {
-                    address: action.text
+                [action.oridest]: Object.assign({}, state[action.oridest], {
+                    place: place
                 })
             });
+
     }
 };
