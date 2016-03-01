@@ -13,12 +13,12 @@ export const timings = (state = defaultTimings, action) => {
 
         case 'RECEIVE_TIMINGS':
             console.info('RECEIVE_TIMINGS reducer');
-            if (!action.timings) {
+            if (!action.item) {
                 return Object.assign({}, state, {directions: []});
             } else {
                 return Object.assign({}, state, {directions: [
                     ...state.directions,
-                    item
+                    action.item
                 ]});
             }
     }
