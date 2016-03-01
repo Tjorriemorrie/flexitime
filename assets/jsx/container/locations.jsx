@@ -1,5 +1,7 @@
 import { connect } from 'react-redux';
-import { changeAddress, fetchDirections } from '../actions/locations.jsx';
+import { changeAddress } from '../actions/locations.jsx';
+import { fetchDirections } from '../actions/directions.jsx';
+import { fetchTimings } from '../actions/timings.jsx';
 import Locations from '../components/locations.jsx';
 
 const mapStateToProps = (state) => {

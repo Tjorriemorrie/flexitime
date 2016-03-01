@@ -14,9 +14,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onRouteSelect: (route) => {
-            dispatch(routeSelected(route));
-        }
     }
 };
 

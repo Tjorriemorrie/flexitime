@@ -1,10 +1,4 @@
-import fetchSuggestions from '../actions/locations.jsx';
-
-
-const defaultDirections = {
-    directions: null,
-    route: null
-};
+const defaultDirections = {};
 
 export const directions = (state = defaultDirections, action) => {
     switch (action.type) {
@@ -13,14 +7,8 @@ export const directions = (state = defaultDirections, action) => {
             return state;
 
         case 'RECEIVE_DIRECTIONS':
-            return Object.assign({}, state, {
-                directions: action.directions
-            });
-
-        case 'ROUTE_SELECTED':
-            return Object.assign({}, state, {
-                route: action.route
-            });
+            console.info('RECEIVE_DIRECTIONS reducer');
+            return Object.assign({}, state, action.directions);
 
     }
 };

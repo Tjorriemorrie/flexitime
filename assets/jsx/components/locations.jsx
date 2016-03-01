@@ -37,10 +37,10 @@ class Locations extends React.Component {
                             controlPosition={google.maps.ControlPosition.TOP_LEFT}
                             onPlacesChanged={() => onChange(this.refs.searchBoxWork.getPlaces(), 'work')}
                         />
-                        {(directions.directions)
+                        {(directions.routes)
                             ? <DirectionsRenderer
-                                directions={directions.directions}
-                                options={{hideRouteList: false}}
+                                directions={directions}
+                                options={{hideRouteList: true}}
                             />
                             : null
                         }
