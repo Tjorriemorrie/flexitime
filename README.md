@@ -6,3 +6,5 @@ Optimise traffic time saved by shifting working time.
 Too many constraints from google maps api.
 Now abandonware.
 Pity.
+
+![alt text](flexitime.png)
