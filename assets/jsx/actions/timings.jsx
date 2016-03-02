@@ -11,15 +11,39 @@ export const receiveTimings = (item) => {
 
 const config_default = {
     travelMode: google.maps.TravelMode.DRIVING,
-    provideRouteAlternatives: false,
+    provideRouteAlternatives: true,
     avoidHighways: false,
     avoidTolls: false,
     unitSystem: google.maps.UnitSystem.METRIC,
-    optimizeWaypoints: true,
 };
 
 
-const getRouteBegin = (s, shift, waypts, dispatch) => {
+const filterMostSimilarRoute = (normal_route, result) => {
+    let route_scores = [];
+    let score;
+    for (let result_route of result.routes) {
+        score = 0;
+        for (let result_path in result_route.overview_path) {
+            let result_path_latlng = new google.maps.LatLng(result_path);
+            //console.info('resultpathlatlng', result_path_latlng);
+            for (let normal_path of normal_route.overview_path) {
+                let normal_path_latlng = new google.maps.LatLng(normal_path);
+                //console.info('normal_path_latlng', normal_path_latlng);
+                if (normal_path_latlng.equals(result_path_latlng)) {
+                    score += 1;
+                    break;
+                }
+            }
+            break;
+        }
+        route_scores.push(score);
+    }
+    console.info('scores', route_scores);
+    return route_scores;
+};
+
+
+const getRouteBegin = (s, shift, dispatch) => {
     console.info('getRouteBegin');
 
     const ds = new google.maps.DirectionsService();
@@ -28,18 +52,16 @@ const getRouteBegin = (s, shift, waypts, dispatch) => {
         destination: s.locations.work.place.geometry.location,
         drivingOptions: {
             departureTime: moment().add(1, 'w').day(1).hour(6).startOf('hour').add(shift, 'm').toDate(),
-            trafficModel: google.maps.TrafficModel.PESSIMISTIC
+            trafficModel: google.maps.TrafficModel.BEST_GUESS
         },
-        waypoints: waypts,
     });
 
     ds.route(config_begin, (result, status) => {
-        console.info('getRouteBegin callback status', status);
-        console.info('getRouteBegin callback result', result);
+        //console.info('getRouteBegin callback status', status);
+        //console.info('getRouteBegin callback result', result);
         if (status === google.maps.DirectionsStatus.OK) {
-            setTimeout(() => {
-                getRouteEnd(s, shift, result, waypts, dispatch);
-            }, Math.abs(shift) * 100);
+            //let route_scores = filterMostSimilarRoute(s.directions.routes[0], result);
+            getRouteEnd(s, shift, result, dispatch);
         } else {
             console.error(status);
         }
@@ -47,7 +69,7 @@ const getRouteBegin = (s, shift, waypts, dispatch) => {
 };
 
 
-const getRouteEnd = (s, shift, route_begin, waypts, dispatch) => {
+const getRouteEnd = (s, shift, route_begin, dispatch) => {
     console.info('getRouteEnd');
 
     const departTime = route_begin.request.drivingOptions.departureTime;
@@ -59,9 +81,8 @@ const getRouteEnd = (s, shift, route_begin, waypts, dispatch) => {
         destination: s.locations.home.place.geometry.location,
         drivingOptions: {
             departureTime: moment(departTime).add(9, 'h').add(durationTime, 's').toDate(),
-            trafficModel: google.maps.TrafficModel.PESSIMISTIC
+            trafficModel: google.maps.TrafficModel.BEST_GUESS
         },
-        waypoints: waypts,
     });
 
     ds.route(config_end, (result, status) => {
@@ -69,7 +90,12 @@ const getRouteEnd = (s, shift, route_begin, waypts, dispatch) => {
         //console.info('getRouteEnd callback result', result);
         if (status === google.maps.DirectionsStatus.OK) {
             //parseRoutes(s, shift, route_begin, result, dispatch);
+            let end_date = moment(result.request.drivingOptions.departureTime);
+            let five = moment(end_date).hour(17).startOf('hour');
+            //console.log(end_date);
+            //console.log(five);
             dispatch(receiveTimings({
+                shift: moment.duration(end_date.diff(five)).asMinutes(),
                 dir_begin: route_begin,
                 dir_end: result,
             }));
@@ -80,46 +106,23 @@ const getRouteEnd = (s, shift, route_begin, waypts, dispatch) => {
 };
 
 
-//const parseRoutes = (s, shift, route_begin, route_end, dispatch) => {
-//    console.info('parseRoutes');
-//
-//    let item = {
-//        shift: shift,
-//        dir_begin: route_begin,
-//        dir_end: route_end,
-//    };
-//    //item.dit_begin = item.dir_begin.routes[0].legs[0].duration_in_traffic.value - dit;
-//    //item.dit_end = item.dir_end.routes[0].legs[0].duration_in_traffic.value - dit;
-//    //item.dit_total = item.dit_begin + item.dit_end;
-//    //item.value_per_unit = item.dit_total / Math.max(1, Math.abs(item.shift));
-//    dispatch(receiveTimings(item));
-//};
-
-
 export const fetchTimings = () => {
     return function (dispatch, getState) {
         console.info('fetchTimings action');
+        dispatch(receiveTimings(null));
+
         let s = getState();
         if (!s.directions.routes) {
             console.info('directions not valid');
-            dispatch(receiveTimings(null));
-        } else {
-            console.info('all directions valid, get timings');
+        }
 
-            // set route as waypoints to always use same route
-            let waypts = [];
-            const wayptInterval = Math.round(s.directions.routes[0].overview_path.length / 10);
-            for (let i = wayptInterval; i < s.directions.routes[0].overview_path.length; i += wayptInterval) {
-                waypts.push({
-                    location: s.directions.routes[0].overview_path[i]
-                });
-            }
-            console.info('waypts', waypts.length, waypts);
+        else {
+            console.info('all directions valid, get timings');
 
             for (let shift = 0; shift <= 150; shift += 15) {
                 setTimeout(() => {
-                    getRouteBegin(s, shift, waypts, dispatch);
-                }, Math.abs(shift) * 100);
+                    getRouteBegin(s, shift, dispatch);
+                }, Math.abs(shift) * 150);
             }
         }
     }

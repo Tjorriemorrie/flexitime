@@ -4,29 +4,39 @@ import TimingsView from '../components/timings.jsx';
 
 
 const timingsOrdered = (state) => {
-    //const shortest time
-    //let max_other_dit = 0;
-    //for (direction of s.timings.directions) {
-    //    if (direction.dir_begin.routes[0].legs[0].duration_in_traffic.value > max_other_dit) {
-    //        max_other_dit = direction.routes[0].legs[0].duration_in_traffic.value;
-    //    }
-    //    if (direction.dir_end.routes[0].legs[0].duration_in_traffic.value > max_other_dit) {
-    //        max_other_dit = direction.routes[0].legs[0].duration_in_traffic.value;
-    //    }
-    //}
-    //max_other_dit = Math.max(
-    //    max_other_dit,
-    //    route_begin.routes[0].legs[0].duration_in_traffic.value,
-    //    route_end.routes[0].legs[0].duration_in_traffic.value
-    //);
-    //console.info('Max DIT', max_other_dit);
-    //
-    //// order by v/u
-    //direction = directions.sort(function(a, b) {
-    //   return parseFloat(a.shift) - parseFloat(b.shift);
-    //});
+    // exit if empty
+    let directions = state.timings.directions;
+    if (!directions.length) {
+        return [];
+    }
 
-    return state.timings.directions;
+    // get maximum traffic time
+    let max_dit_begin = 0;
+    for (let direction of directions) {
+        if (direction.dir_begin.routes[0].legs[0].duration_in_traffic.value > max_dit_begin) {
+            max_dit_begin = direction.dir_begin.routes[0].legs[0].duration_in_traffic.value;
+        }
+    }
+    let max_dit_end = 0;
+    for (let direction of directions) {
+        if (direction.dir_end.routes[0].legs[0].duration_in_traffic.value > max_dit_end) {
+            max_dit_end = direction.dir_end.routes[0].legs[0].duration_in_traffic.value;
+        }
+    }
+    console.info('Max DITs', max_dit_begin, max_dit_end);
+
+    // calculate vpu
+    for (let direction of directions) {
+        let gain_begin = max_dit_begin - direction.dir_begin.routes[0].legs[0].duration_in_traffic.value;
+        let gain_end = max_dit_end - direction.dir_end.routes[0].legs[0].duration_in_traffic.value;
+        let gain = gain_begin + gain_end;
+        direction.vpu = gain * 10 / Math.max(1, Math.abs(direction.shift));
+    }
+
+    // order by v/u
+    return directions.sort(function(a, b) {
+       return parseFloat(b.vpu) - parseFloat(a.vpu);
+    });
 };
 
 const mapStateToProps = (state) => {
