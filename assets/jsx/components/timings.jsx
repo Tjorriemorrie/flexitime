@@ -14,12 +14,11 @@ const renderTable = (directions) => {
         return <table width="100%">
             <thead>
                 <tr>
-                    <th>Shift</th>
                     <th>Depart Home At</th>
-                    <th>Sec saved</th>
+                    <th>Traffic Secs</th>
                     <th>Depart Work At</th>
-                    <th>Sec saved</th>
-                    <th>Sec saved per min shifted</th>
+                    <th>Traffic Secs</th>
+                    <th>v/u</th>
                 </tr>
             </thead>
             <tbody>
